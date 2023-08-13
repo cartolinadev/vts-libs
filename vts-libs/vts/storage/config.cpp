@@ -534,7 +534,7 @@ extraStorageConfigFromJson(int version, const Json::Value &config)
             << version << ".";
 
     } catch (const Json::Error &e) {
-        LOGTHROW(err1, vtslibs::storage::FormatError)
+        LOGTHROW(err2, vtslibs::storage::FormatError)
             << "Invalid extra config format (" << e.what()
             << "); Unable to work with this config.";
     }
@@ -552,7 +552,7 @@ ExtraStorageProperties loadExtraConfig(std::istream &in
     try {
         Json::get(version, config, "version");
     } catch (const Json::Error &e) {
-        LOGTHROW(err1, vtslibs::storage::FormatError)
+        LOGTHROW(err2, vtslibs::storage::FormatError)
             << "Invalid extra config format (" << e.what()
             << "); Unable to work with this config.";
     }
