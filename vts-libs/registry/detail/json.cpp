@@ -121,6 +121,14 @@ void build(Json::Value &content, const math::Extents2 &extents)
     ur.append(extents.ur(1));
 }
 
+void build(Json::Value &content, const math::Point2 &point) {
+
+    content = Json::arrayValue;
+    
+    content.append(point(0)); content.append(point(1));
+}
+
+
 void build(Json::Value &content, const ReferenceFrame::Division::Node::Id &id)
 {
     content = Json::objectValue;

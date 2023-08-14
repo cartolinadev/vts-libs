@@ -46,6 +46,8 @@ void parseIntSet(std::set<int> &set, const Json::Value &value
 void parse(ReferenceFrame::Model &model, const Json::Value &content);
 void build(Json::Value &content, const ReferenceFrame::Model &model);
 
+void build(Json::Value &content, const math::Point2 &point);
+
 void parse(math::Extents3 &extents, const Json::Value &content);
 void build(Json::Value &content, const math::Extents3 &extents);
 

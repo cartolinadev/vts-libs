@@ -57,18 +57,33 @@ typedef math::Extents2_<unsigned int> TileRange;
 
 struct View {
     struct BoundLayerParams {
+    
+        enum class Mode { normal, imultiply };
+        
+        struct Alpha {
+        
+            enum class Mode { constant, viewdep };
+        
+            double value;
+            Mode mode;
+            boost::optional<math::Point2> illumination;
+            
+            Alpha(double value = 1.0) : value(value), mode(Mode::constant), illumination() {}
+        };
+    
         std::string id;
-        boost::optional<double> alpha;
+        Mode mode;
+        boost::optional<Alpha> alpha;
         boost::any options;
 
         BoundLayerParams(const std::string &id = std::string())
-            : id(id), alpha()
+            : id(id), mode(Mode::normal), alpha()
         {}
 
         /** Tells whether these bound layer parameters are complex.
          */
         bool isComplex() const {
-            return (bool(alpha) || !options.empty());
+            return( mode != Mode::normal || bool(alpha) || !options.empty());
         }
 
         typedef std::vector<BoundLayerParams> list;
@@ -126,6 +141,18 @@ struct View {
      */
     typedef std::map<std::string, View> map;
 };
+
+
+UTILITY_GENERATE_ENUM_IO(View::BoundLayerParams::Mode,
+    ((normal)("normal"))
+    ((imultiply)("invert-then-multiply")("imultiply"))
+)
+
+UTILITY_GENERATE_ENUM_IO(View::BoundLayerParams::Alpha::Mode,
+    ((constant)("constant")("const"))
+    ((viewdep)("view-dependent")("viewdep"))
+)
+
 
 struct Roi {
     std::string exploreUrl;
