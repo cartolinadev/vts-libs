@@ -1709,15 +1709,25 @@ Json::Value asJson(const View &view, BoundLayer::dict &boundLayers)
                 p["id"] = blp.id;
                 p["mode"] = boost::lexical_cast<std::string>(blp.mode);
                 
-                if (blp.alpha) { 
-                
-                    auto &r(p["alpha"] = Json::objectValue);
-                    
-                    r["value"] = blp.alpha->value; 
-                    r["mode"] = boost::lexical_cast<std::string>(blp.alpha->mode);
+                if (blp.alpha) {
 
-                    if (blp.alpha->illumination) {
-                        detail::build(r["illumination"], *blp.alpha->illumination);
+                    const auto & alpha(*blp.alpha);
+
+                    if (alpha.mode == View::BoundLayerParams::Alpha::Mode::constant) {
+
+                        p["alpha"] = alpha.value;
+
+                    } else {
+
+                        // complex alpha
+                        auto &r(p["alpha"] = Json::objectValue);
+
+                        r["value"] = alpha.value;
+                        r["mode"] = boost::lexical_cast<std::string>(alpha.mode);
+
+                        if (alpha.illumination) {
+                            detail::build(r["illumination"], *alpha.illumination);
+                        }
                     }
                 }
                 
@@ -1800,11 +1810,10 @@ void fromJson(View &view, const Json::Value &value)
             
                 bls.emplace_back();
                 auto &item(bls.back());
+
                 Json::get(item.id, blp, "id");
-                
-                item.mode = boost::lexical_cast<View::BoundLayerParams::Mode>(
-                    Json::as<std::string>(blp["mode"]));
-                    
+                Json::getOpt(item.mode, blp, "mode");
+
                 if (blp.isMember("alpha")) {
                 
                     const auto &alpha(blp["alpha"]);
@@ -1812,12 +1821,10 @@ void fromJson(View &view, const Json::Value &value)
                     if (alpha.isObject()) {
                 
                         item.alpha = View::BoundLayerParams::Alpha();
+
                         Json::get(item.alpha->value, alpha, "value");
-                    
-                        item.alpha->mode  = boost::lexical_cast<
-                            View::BoundLayerParams::Alpha::Mode>(
-                                Json::as<std::string>(alpha["mode"]));
-                                
+                        Json::getOpt(item.alpha->mode, alpha, "mode");
+
                         if (alpha.isMember("illumination")) {
                     
                             const auto &illumination(alpha["illumination"]);
@@ -1831,8 +1838,8 @@ void fromJson(View &view, const Json::Value &value)
                             item.alpha->illumination = math::Point2();
                             auto &illum(*item.alpha->illumination);
                     
-                            Json::get(illum[0], illumination, 0, "illum[0]");
-                            Json::get(illum[1], illumination, 1, "illum[1]");                         
+                            Json::get(illum[0], illumination, 0, "illumination[0]");
+                            Json::get(illum[1], illumination, 1, "illumination[1]");
                         }
                     
                     } else if (alpha.isNumeric()) {
