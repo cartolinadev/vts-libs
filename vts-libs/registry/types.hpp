@@ -58,7 +58,7 @@ typedef math::Extents2_<unsigned int> TileRange;
 struct View {
     struct BoundLayerParams {
     
-        enum class Mode { normal, imultiply };
+        enum class Mode { normal, multiply };
         
         struct Alpha {
         
@@ -145,7 +145,7 @@ struct View {
 
 UTILITY_GENERATE_ENUM_IO(View::BoundLayerParams::Mode,
     ((normal)("normal"))
-    ((imultiply)("invert-then-multiply")("imultiply"))
+    ((multiply)("multiply"))
 )
 
 UTILITY_GENERATE_ENUM_IO(View::BoundLayerParams::Alpha::Mode,

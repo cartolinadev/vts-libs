@@ -620,11 +620,12 @@ void parse(Srs &srs, const Json::Value &content)
 {
     Json::get(srs.comment, content, "comment");
 
-    // just mode
+    Json::get(srs.type, content, "type");
+
     std::string s;
-    srs.type = boost::lexical_cast<Srs::Type>(Json::get(s, content, "type"));
     srs.srsDef = { Json::get(s, content, "srsDef")
                    , geo::SrsDefinition::Type::proj4};
+
     if (content.isMember("geoidGrid")) {
         srs.geoidGrid = parseGeoidGrid(content["geoidGrid"]);
     }
