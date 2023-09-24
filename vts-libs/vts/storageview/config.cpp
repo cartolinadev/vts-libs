@@ -50,7 +50,7 @@ void parseSet(std::set<std::string> &ids, const Json::Value &object
     const Json::Value &value(object[name]);
 
     if (!value.isArray()) {
-        LOGTHROW(err1, Json::Error)
+        LOGTHROW(err2, Json::Error)
             << "Type of " << name << " is not a list.";
     }
 
@@ -64,7 +64,7 @@ void parseList(std::vector<fs::path> &paths, const Json::Value &value
                , const char *name)
 {
     if (!value.isArray()) {
-        LOGTHROW(err1, Json::Error)
+        LOGTHROW(err2, Json::Error)
             << "Type of " << name << " is not a list.";
     }
 
@@ -89,7 +89,7 @@ void parseFlMap(FreelayerTileset::map &flMap, const Json::Value &object
     }
 
     if (!value.isObject()) {
-        LOGTHROW(err1, Json::Error)
+        LOGTHROW(err2, Json::Error)
             << "Type of " << name << " is not a list or an object.";
     }
 
@@ -143,12 +143,12 @@ StorageView::Properties loadConfig(std::istream &in, const fs::path &path)
             return detail::parse1(config);
         }
 
-        LOGTHROW(err1, vtslibs::storage::FormatError)
+        LOGTHROW(err2, vtslibs::storage::FormatError)
             << "Invalid storageview config format: unsupported version "
             << version << ".";
 
     } catch (const Json::Error &e) {
-        LOGTHROW(err1, vtslibs::storage::FormatError)
+        LOGTHROW(err2, vtslibs::storage::FormatError)
             << "Invalid storageview config format (" << e.what()
             << "); Unable to work with this storageview.";
     }
@@ -164,7 +164,7 @@ StorageView::Properties loadConfig(const fs::path &path)
         f.open(path.string(), std::ios_base::in);
         f.peek();
     } catch (const std::exception &e) {
-        LOGTHROW(err1, vtslibs::storage::NoSuchStorageView)
+        LOGTHROW(err2, vtslibs::storage::NoSuchStorageView)
             << "Unable to load storage view config file " << path << ".";
     }
     auto p(loadConfig(f, path));
