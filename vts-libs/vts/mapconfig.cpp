@@ -171,6 +171,7 @@ void asJson(const SurfaceCommonConfig &surface, Json::Value &s
         s["metaUrl"] = surface.urls3d->meta;
         s["meshUrl"] = surface.urls3d->mesh;
         s["textureUrl"] = surface.urls3d->texture;
+        if (surface.hasNormalMaps) s["normalsUrl"] = surface.urls3d->normals;
         s["navUrl"] = surface.urls3d->nav;
     } else {
         s["metaUrl"]
@@ -182,6 +183,13 @@ void asJson(const SurfaceCommonConfig &surface, Json::Value &s
         s["textureUrl"]
             = (root / fileTemplate(storage::TileFile::atlas
                                    , surface.revision)).string();
+
+        if (surface.hasNormalMaps) {
+            s["normalsUrl"]
+                = (root / fileTemplate(storage::TileFile::normals
+                                   , surface.revision)).string();
+        }
+
         s["navUrl"]
             = (root / fileTemplate(storage::TileFile::navtile
                                    , surface.revision)).string();

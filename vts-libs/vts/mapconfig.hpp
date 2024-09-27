@@ -60,6 +60,7 @@ struct MapConfigOptions {
 struct SurfaceUrls3d {
     std::string meta;
     std::string mesh;
+    std::string normals;
     std::string texture;
     std::string nav;
 };
@@ -116,6 +117,7 @@ struct SurfaceCommonConfig {
     registry::TileRange tileRange;
     boost::optional<std::string> textureLayer;
     bool has2dInterface;
+    bool hasNormalMaps;
     unsigned int revision;
 
     /** If not present values are auto filled from root and default templates.
@@ -127,7 +129,8 @@ struct SurfaceCommonConfig {
      */
     boost::optional<SurfaceUrls2d> urls2d;
 
-    SurfaceCommonConfig() : has2dInterface(false), revision(0) {}
+    SurfaceCommonConfig() :
+        has2dInterface(false), hasNormalMaps(false), revision(0) {}
 };
 
 struct SurfaceConfig : SurfaceCommonConfig {

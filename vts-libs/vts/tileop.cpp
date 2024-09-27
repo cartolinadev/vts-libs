@@ -206,6 +206,7 @@ std::string fileTemplate(TileFile type, FileFlavor flavor
     switch (type) {
     case TileFile::atlas:
     case TileFile::ortho:
+    case TileFile::normals:
         return str(boost::format("{lod}-{x}-{y}-{sub}.%s") % ext);
 
     default: break;
