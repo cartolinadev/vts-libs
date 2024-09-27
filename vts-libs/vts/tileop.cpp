@@ -41,6 +41,7 @@ namespace {
     const std::string MetaExt("meta");
     const std::string MeshExt("bin");
     const std::string AtlasExt("jpg");
+    const std::string NormalsExt("nm");
     const std::string NavTileExt("nav");
     const std::string Meta2dExt("2dmeta");
     const std::string MaskExt("mask");
@@ -49,6 +50,7 @@ namespace {
 
     const std::string RawMeshExt("rmesh");
     const std::string RawAtlasExt("ratlas");
+    const std::string RawNormalsExt("rnm");
     const std::string RawNavTileExt("rnavtile");
 
     const std::string DebugMaskExt("mask.dbg");
@@ -78,6 +80,14 @@ namespace {
             case FileFlavor::debug: break;
             }
             break;
+        case TileFile::normals:
+            switch(flavor) {
+                case FileFlavor::regular: return NormalsExt;
+                case FileFlavor::raw: return RawNormalsExt;
+                case FileFlavor::debug: break;
+            }
+            break;
+
         case TileFile::navtile:
             switch (flavor) {
             case FileFlavor::regular: return NavTileExt;
@@ -117,6 +127,7 @@ namespace {
         HANDLE_EXT(MetaExt, meta)
         HANDLE_EXT(MeshExt, mesh)
         HANDLE_EXT(AtlasExt, atlas)
+        HANDLE_EXT(NormalsExt, normals)
         HANDLE_EXT(NavTileExt, navtile)
         HANDLE_EXT(Meta2dExt, meta2d)
         HANDLE_EXT(MaskExt, mask)
@@ -134,6 +145,7 @@ namespace {
 
         HANDLE_EXT(RawMeshExt, mesh)
         HANDLE_EXT(RawAtlasExt, atlas)
+        HANDLE_EXT(RawNormalsExt, normals)
         HANDLE_EXT(RawNavTileExt, navtile)
 #undef HANDLE_EXT
 
@@ -162,6 +174,7 @@ namespace {
                 switch (type) {
                 case TileFile::atlas:
                 case TileFile::ortho:
+                case TileFile::normals:
                     return !(flavor && (*flavor != FileFlavor::regular));
                     break;
 

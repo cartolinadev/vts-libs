@@ -37,6 +37,7 @@ UTILITY_GENERATE_ENUM_IO(TileFile,
                          ((meta))
                          ((mesh))
                          ((atlas))
+                         ((normals))
                          ((navtile))
                          ((meta2d))
                          ((mask))

@@ -30,7 +30,7 @@ namespace vtslibs { namespace storage {
 
 enum class TileFile {
     // 3D interface
-    meta, mesh, atlas, navtile
+    meta, mesh, atlas, normals, navtile
 
    // 2D interface
    , meta2d, mask, ortho, credits
