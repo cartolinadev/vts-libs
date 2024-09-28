@@ -144,6 +144,10 @@ public:
      */
     operator bool() const { return bool(conv_); }
 
+#ifdef GEO_HAS_GDAL
+    const geo::CsConvertor& conv() const { return *conv_; };
+#endif // GEO_HAS_GDAL
+
 private:
     /** Helper constructor for conversion inversion.
      */

@@ -356,7 +356,7 @@ inline double tileSize(const math::Extent &rootExtent, Lod lod)
 {
     auto tc(tileCount(lod));
     auto rs(math::size(rootExtent));
-    return { rs / tc };
+    return rs / tc;
 }
 
 inline const TileId& tileId(const RFNode::Id &rfNodeId)
