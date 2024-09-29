@@ -123,6 +123,9 @@ const char* contentType(TileFile type)
     case TileFile::mask:
         return "image/png";
 
+    case TileFile::normals:
+        return "image/webp";
+
     case TileFile::credits:
         return "application/json; charset=utf-8";
 

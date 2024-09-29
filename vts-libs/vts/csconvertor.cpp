@@ -121,11 +121,11 @@ CsConvertor::CsConvertor(const registry::Srs &srsFrom
 void CsConvertor::init(const registry::Srs *srsFrom
                        , const registry::Srs *srsTo)
 {
-    LOG(debug) << "CsConvert(\"" << srsFrom->srsDef << '"'
+/*    LOG(debug) << "CsConvert(\"" << srsFrom->srsDef << '"'
                << (srsFrom->adjustVertical() ? " [va]" : "")
                << ", \"" << srsTo->srsDef << '"'
                << (srsTo->adjustVertical() ? " [va]" : "")
-               << ").";
+               << ")."; */
     if (srsFrom != srsTo) {
         conv_ = boost::in_place(srsFrom->srsDef, srsTo->srsDef);
 
