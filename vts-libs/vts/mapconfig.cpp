@@ -330,6 +330,12 @@ void fromJson(SurfaceCommonConfig &surface, const Json::Value &value)
     surface.urls3d = boost::in_place();
     Json::get(surface.urls3d->meta, value, "metaUrl");
     Json::get(surface.urls3d->mesh, value, "meshUrl");
+
+    if (value.isMember("normalsUrl")) {
+        surface.hasNormalMaps = true;
+        Json::get(surface.urls3d->normals, value, "normalsUrl");
+    }
+
     Json::get(surface.urls3d->texture, value, "textureUrl");
     Json::get(surface.urls3d->nav, value, "navUrl");
 
