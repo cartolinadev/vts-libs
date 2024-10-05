@@ -282,6 +282,8 @@ FullTileSetProperties parse1(const Json::Value &config)
     // load driver options
     properties.driverOptions = parseDriver(config["driver"]);
 
+    Json::getOpt(properties.hasNormalMaps, config, "hasNormalMaps");
+
     Json::get(properties.lodRange.min, config, "lodRange", 0);
     Json::get(properties.lodRange.max, config, "lodRange", 1);
 
@@ -323,6 +325,8 @@ void build(Json::Value &config, const FullTileSetProperties &properties)
     if (!properties.driverOptions.empty()) {
         config["driver"] = buildDriver(properties.driverOptions);
     }
+
+    config["hasNormalMaps"] = properties.hasNormalMaps;
 
     auto &lodRange(config["lodRange"] = Json::arrayValue);
     lodRange.append(properties.lodRange.min);

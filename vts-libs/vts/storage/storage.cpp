@@ -619,6 +619,9 @@ MapConfig Storage::Detail::mapConfig(const boost::filesystem::path &root
                                      , const FreelayerTileset::map *freeLayers
                                      , const fs::path &prefix)
 {
+
+    LOG(debug) << "Generating mapConfig for storage.";
+
     auto referenceFrame(registry::system.referenceFrames
                         (properties.referenceFrame));
 

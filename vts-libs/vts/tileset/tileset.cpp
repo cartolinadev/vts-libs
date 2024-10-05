@@ -1719,6 +1719,8 @@ MapConfig mapConfig(const FullTileSetProperties &properties
                     , const ExtraTileSetProperties &extra
                     , const boost::optional<boost::filesystem::path> &root)
 {
+    LOG(debug) << "Generating mapConfig for tileset.";
+
     auto referenceFrame(registry::system.referenceFrames
                         (properties.referenceFrame));
 
@@ -1745,6 +1747,7 @@ MapConfig mapConfig(const FullTileSetProperties &properties
     surface.id = properties.id;
     surface.revision = properties.revision;
     surface.has2dInterface = true;
+    surface.hasNormalMaps = properties.hasNormalMaps;
 
     if (root) {
         surface.root = *root;

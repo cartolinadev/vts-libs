@@ -68,6 +68,11 @@ struct TileSetProperties {
      */
     registry::Position position;
 
+    /*
+     * normals
+     */
+    bool hasNormalMaps = false;
+
     TileSetProperties() {}
 };
 
