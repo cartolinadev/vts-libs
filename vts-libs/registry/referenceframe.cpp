@@ -1708,6 +1708,7 @@ Json::Value asJson(const View &view, BoundLayer::dict &boundLayers)
             if (blp.isComplex()) {
                 auto &p(out.append(Json::objectValue));
                 p["id"] = blp.id;
+                p["type"] = boost::lexical_cast<std::string>(blp.type);
                 p["mode"] = boost::lexical_cast<std::string>(blp.mode);
                 
                 if (blp.alpha) {
@@ -1813,6 +1814,7 @@ void fromJson(View &view, const Json::Value &value)
                 auto &item(bls.back());
 
                 Json::get(item.id, blp, "id");
+                Json::getOpt(item.type, blp, "type");
                 Json::getOpt(item.mode, blp, "mode");
 
                 if (blp.isMember("alpha")) {
@@ -1862,7 +1864,8 @@ void fromJson(View &view, const Json::Value &value)
             
             } else {
                 LOGTHROW(err1, Json::Error)
-                    << "Type of boundLayer must be either string or object.";
+                    << "Type of boundLayer ref in view definition must be "
+                       "either string or object.";
             }
         }
     });

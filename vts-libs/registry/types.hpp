@@ -38,8 +38,10 @@
 #include <boost/any.hpp>
 
 #include "math/geometry_core.hpp"
+#include "utility/enum-io.hpp"
 
 #include "../storage/range.hpp"
+#include "../storage/credits.hpp"
 
 namespace vtslibs { namespace registry {
 
@@ -59,6 +61,8 @@ struct View {
     struct BoundLayerParams {
     
         enum class Mode { normal, multiply };
+
+        enum class Type { diffuse, specular, bump };
         
         struct Alpha {
         
@@ -68,22 +72,25 @@ struct View {
             Mode mode;
             boost::optional<math::Point2> illumination;
             
-            Alpha(double value = 1.0) : value(value), mode(Mode::constant), illumination() {}
+            Alpha(double value = 1.0) : value(value), mode(Mode::constant),
+                illumination() {}
         };
     
         std::string id;
+        Type type;
         Mode mode;
         boost::optional<Alpha> alpha;
         boost::any options;
 
         BoundLayerParams(const std::string &id = std::string())
-            : id(id), mode(Mode::normal), alpha()
+            : id(id), type(Type::diffuse), mode(Mode::normal), alpha()
         {}
 
         /** Tells whether these bound layer parameters are complex.
          */
         bool isComplex() const {
-            return( mode != Mode::normal || bool(alpha) || !options.empty());
+            return(type != Type::diffuse || mode != Mode::normal
+                || bool(alpha) || !options.empty());
         }
 
         typedef std::vector<BoundLayerParams> list;
@@ -152,6 +159,13 @@ UTILITY_GENERATE_ENUM_IO(View::BoundLayerParams::Alpha::Mode,
     ((constant)("constant")("const"))
     ((viewdep)("view-dependent")("viewdep"))
 )
+
+UTILITY_GENERATE_ENUM_IO(View::BoundLayerParams::Type,
+    ((diffuse)("diffuse-map")("diffuse"))
+    ((specular)("specular-map")("specular"))
+    ((bump)("bump-map")("bump"))
+)
+
 
 
 struct Roi {
