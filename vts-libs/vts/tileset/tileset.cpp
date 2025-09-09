@@ -1775,11 +1775,11 @@ MapConfig mapConfig(const FullTileSetProperties &properties
 
     mapConfig.namedViews = extra.namedViews;
 
-    if (extra.view) {
-        // use settings from extra config
-        mapConfig.view = extra.view;
-    } else {
-        // just one surface in the view
+    mapConfig.view = extra.view;
+
+    if (!extra.view) {
+
+        // no surfaces or free layers in view, add the one surface
         mapConfig.view.addSurface(surface.id);
         mapConfig.view.addBodies
             (registry::listParentBodies(referenceFrame));
