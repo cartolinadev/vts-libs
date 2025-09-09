@@ -170,7 +170,7 @@ void asJson(const SurfaceCommonConfig &surface, Json::Value &s
     if (surface.urls3d) {
         s["metaUrl"] = surface.urls3d->meta;
         s["meshUrl"] = surface.urls3d->mesh;
-        s["textureUrl"] = surface.urls3d->texture;
+        if (surface.hasTextures) s["textureUrl"] = surface.urls3d->texture;
         if (surface.hasNormalMaps) s["normalsUrl"] = surface.urls3d->normals;
         s["navUrl"] = surface.urls3d->nav;
     } else {
@@ -180,8 +180,9 @@ void asJson(const SurfaceCommonConfig &surface, Json::Value &s
         s["meshUrl"]
             = (root / fileTemplate(storage::TileFile::mesh
                                    , surface.revision)).string();
-        s["textureUrl"]
-            = (root / fileTemplate(storage::TileFile::atlas
+        if (surface.hasTextures)
+            s["textureUrl"]
+                = (root / fileTemplate(storage::TileFile::atlas
                                    , surface.revision)).string();
 
         if (surface.hasNormalMaps) {
@@ -336,7 +337,11 @@ void fromJson(SurfaceCommonConfig &surface, const Json::Value &value)
         Json::get(surface.urls3d->normals, value, "normalsUrl");
     }
 
-    Json::get(surface.urls3d->texture, value, "textureUrl");
+    if (value.isMember("textureUrl")) {
+        surface.hasTextures = true;
+        Json::get(surface.urls3d->texture, value, "textureUrl");
+    }
+
     Json::get(surface.urls3d->nav, value, "navUrl");
 
     if (value.isMember("2d")) {

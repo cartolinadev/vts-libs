@@ -72,6 +72,8 @@ struct TileSetProperties {
      * normals
      */
     bool hasNormalMaps = false;
+    bool has2dInterface = false;
+    bool hasTextures = true;
 
     TileSetProperties() {}
 };

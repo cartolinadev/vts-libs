@@ -1746,8 +1746,9 @@ MapConfig mapConfig(const FullTileSetProperties &properties
     auto &surface(mapConfig.surfaces.back());
     surface.id = properties.id;
     surface.revision = properties.revision;
-    surface.has2dInterface = true;
+    surface.hasTextures = properties.hasTextures;
     surface.hasNormalMaps = properties.hasNormalMaps;
+    surface.has2dInterface = properties.has2dInterface;
 
     if (root) {
         surface.root = *root;

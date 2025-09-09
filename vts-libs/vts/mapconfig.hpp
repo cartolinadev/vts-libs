@@ -116,8 +116,9 @@ struct SurfaceCommonConfig {
     storage::LodRange lodRange;
     registry::TileRange tileRange;
     boost::optional<std::string> textureLayer;
-    bool has2dInterface;
+    bool hasTextures;
     bool hasNormalMaps;
+    bool has2dInterface;
     unsigned int revision;
 
     /** If not present values are auto filled from root and default templates.
@@ -130,7 +131,8 @@ struct SurfaceCommonConfig {
     boost::optional<SurfaceUrls2d> urls2d;
 
     SurfaceCommonConfig() :
-        has2dInterface(false), hasNormalMaps(false), revision(0) {}
+        hasTextures(true), hasNormalMaps(false),
+        has2dInterface(false), revision(0) {}
 };
 
 struct SurfaceConfig : SurfaceCommonConfig {
