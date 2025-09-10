@@ -1745,6 +1745,7 @@ MapConfig mapConfig(const FullTileSetProperties &properties
     mapConfig.surfaces.emplace_back();
     auto &surface(mapConfig.surfaces.back());
     surface.id = properties.id;
+    surface.generatorRevision = extra.generatorRevision;
     surface.revision = properties.revision;
     surface.hasTextures = properties.hasTextures;
     surface.hasNormalMaps = properties.hasNormalMaps;
@@ -1834,6 +1835,7 @@ meshTilesConfig(const FullTileSetProperties &properties
 
     config.surface.id = properties.id;
     config.surface.revision = properties.revision;
+    config.surface.generatorRevision = extra.generatorRevision;
 
     if (root) {
         config.surface.root = *root;

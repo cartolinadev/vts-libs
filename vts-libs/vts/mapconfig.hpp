@@ -119,6 +119,7 @@ struct SurfaceCommonConfig {
     bool hasTextures;
     bool hasNormalMaps;
     bool has2dInterface;
+    unsigned int generatorRevision;
     unsigned int revision;
 
     /** If not present values are auto filled from root and default templates.
@@ -132,7 +133,7 @@ struct SurfaceCommonConfig {
 
     SurfaceCommonConfig() :
         hasTextures(true), hasNormalMaps(false),
-        has2dInterface(false), revision(0) {}
+        has2dInterface(false), generatorRevision(0), revision(0) {}
 };
 
 struct SurfaceConfig : SurfaceCommonConfig {

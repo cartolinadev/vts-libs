@@ -101,12 +101,12 @@ parseTileIdPrefix(TileId &tileId, const std::string &str
                   , std::string::size_type offset = 0);
 
 std::string fileTemplate(TileFile type
-                         , const boost::optional<unsigned int> &revision
-                         = boost::none);
+    , const boost::optional<unsigned int> &revision = boost::none
+    , const boost::optional<unsigned int> &generatorRevision = boost::none);
 
 std::string fileTemplate(TileFile type, FileFlavor flavor
-                         , const boost::optional<unsigned int> &revision
-                         = boost::none);
+    , const boost::optional<unsigned int> &revision = boost::none
+    , const boost::optional<unsigned int> &generatorRevision = boost::none);
 
 std::string filePath(TileFile type, const TileId &tileId
                      , const boost::optional<unsigned int> &subfile
@@ -469,10 +469,11 @@ inline TileId local(const NodeInfo &nodeInfo)
 }
 
 inline std::string fileTemplate(TileFile type
-                                , const boost::optional<unsigned int>
-                                &revision)
+    , const boost::optional<unsigned int> &revision
+    , const boost::optional<unsigned int> &generatorRevision)
 {
-    return fileTemplate(type, FileFlavor::regular, revision);
+    return fileTemplate(type, FileFlavor::regular,
+                        revision, generatorRevision);
 }
 
 inline std::string asFilename(const TileId &tileId, TileFile type)

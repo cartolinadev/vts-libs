@@ -196,11 +196,28 @@ std::string asFilename(const TileId &tileId, TileFile type, FileFlavor flavor)
 }
 
 std::string fileTemplate(TileFile type, FileFlavor flavor
-                         , const boost::optional<unsigned int> &revision)
+                    , const boost::optional<unsigned int> &revision
+                    , const boost::optional<unsigned int> &generatorRevision)
 {
     std::string ext(extension(type, flavor));
-    if (revision) {
+    auto fa(true);
+
+    if (revision || generatorRevision) {
         ext = str(boost::format("%s?%s") % ext % *revision);
+    }
+
+    if (generatorRevision && *generatorRevision > 0) {
+        ext = str(boost::format("%sgr=%s") % ext % *generatorRevision);
+        fa=false;
+    }
+
+    if (revision) {
+
+        if (fa)
+            ext = str(boost::format("%s%s") % ext % *revision);
+        else
+            ext = str(boost::format("%s&r=%s") % ext % *revision);
+
     }
 
     switch (type) {

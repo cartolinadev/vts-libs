@@ -176,24 +176,24 @@ void asJson(const SurfaceCommonConfig &surface, Json::Value &s
     } else {
         s["metaUrl"]
             = (root / fileTemplate(storage::TileFile::meta
-                                   , surface.revision)).string();
+                    , surface.revision, surface.generatorRevision)).string();
         s["meshUrl"]
             = (root / fileTemplate(storage::TileFile::mesh
-                                   , surface.revision)).string();
+                    , surface.revision, surface.generatorRevision)).string();
         if (surface.hasTextures)
             s["textureUrl"]
                 = (root / fileTemplate(storage::TileFile::atlas
-                                   , surface.revision)).string();
+                    , surface.revision, surface.generatorRevision)).string();
 
         if (surface.hasNormalMaps) {
             s["normalsUrl"]
                 = (root / fileTemplate(storage::TileFile::normals
-                                   , surface.revision)).string();
+                    , surface.revision, surface.generatorRevision)).string();
         }
 
         s["navUrl"]
             = (root / fileTemplate(storage::TileFile::navtile
-                                   , surface.revision)).string();
+                    , surface.revision, surface.generatorRevision)).string();
     }
 
     if (surface.has2dInterface) {
@@ -206,16 +206,16 @@ void asJson(const SurfaceCommonConfig &surface, Json::Value &s
         } else {
             i2d["metaUrl"]
                 = (root / fileTemplate(storage::TileFile::meta2d
-                                       , surface.revision)).string();
+                    , surface.revision, surface.generatorRevision)).string();
             i2d["maskUrl"]
                 = (root / fileTemplate(storage::TileFile::mask
-                                       , surface.revision)).string();
+                    , surface.revision, surface.generatorRevision)).string();
             i2d["orthoUrl"]
                 = (root / fileTemplate(storage::TileFile::ortho
-                                       , surface.revision)).string();
+                    , surface.revision, surface.generatorRevision)).string();
             i2d["creditsUrl"]
                 = (root / fileTemplate(storage::TileFile::credits
-                                       , surface.revision)).string();
+                    , surface.revision, surface.generatorRevision)).string();
         }
     }
 
@@ -1023,6 +1023,7 @@ struct Absolutize
             absolutize(surface.urls3d->meta);
             absolutize(surface.urls3d->mesh);
             absolutize(surface.urls3d->texture);
+            absolutize(surface.urls3d->normals);
             absolutize(surface.urls3d->nav);
         }
 

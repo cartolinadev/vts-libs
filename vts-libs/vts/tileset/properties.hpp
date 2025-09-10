@@ -79,6 +79,7 @@ struct TileSetProperties {
 };
 
 struct FullTileSetProperties : TileSetProperties {
+
     /** Data version/revision. Should be increment anytime the data change.
      *  Used in template URL's to push through caches.
      */
@@ -106,7 +107,8 @@ struct FullTileSetProperties : TileSetProperties {
      */
     boost::optional<double> nominalTexelSize;
 
-    FullTileSetProperties() : revision(0), mergeBottomLod(0) {}
+    FullTileSetProperties() :
+        revision(0), mergeBottomLod(0) {}
 
     FullTileSetProperties(const TileSetProperties &slice)
         : TileSetProperties(slice), revision(0), mergeBottomLod(0)
@@ -159,6 +161,8 @@ struct ExtraTileSetProperties {
     /** Extra bodies.
      */
     registry::Body::dict bodies;
+
+    unsigned int generatorRevision;
 
     /** Browser core options. Opaque structure.
      */
