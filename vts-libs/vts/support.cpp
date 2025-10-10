@@ -39,7 +39,7 @@ const storage::SupportFile::Vars defaultSupportVars([]()
 {
     storage::SupportFile::Vars vars;
     vars["VTS_BUILTIN_BROWSER_URL"]
-        = "//cdn.melown.com/libs/vtsjs/builtin/v2";
+        = "//cdn.tspl.re/libs/cartolina";
     return vars;
 }());
 
