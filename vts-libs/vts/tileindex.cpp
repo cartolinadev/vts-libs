@@ -574,7 +574,8 @@ TileIndex& TileIndex::completeDown(Flag::value_type type)
 
 }
 
-TileIndex& TileIndex::completeDownFromBottom(Flag::value_type type)
+TileIndex& TileIndex::completeDownFromBottom(Flag::value_type type
+                                             , Flag::value_type clearOnFill)
 {
     auto filter([type](QTree::value_type value) { return (value & type); });
 
@@ -599,6 +600,15 @@ TileIndex& TileIndex::completeDownFromBottom(Flag::value_type type)
 
         // data mask is merged-in into empty tree, ignore its size
         ctrees->merge(*ritrees, filter);
+
+        // strip caller-requested flags from this synthesised LOD only; the
+        // source LOD (*ritrees) and the LODs above it keep their flags
+        if (clearOnFill) {
+            ctrees->translateEachNode([clearOnFill](QTree::value_type value)
+            {
+                return value & ~clearOnFill;
+            });
+        }
     }
 
     return *this;

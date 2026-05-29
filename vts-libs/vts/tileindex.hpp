@@ -370,9 +370,19 @@ public:
      */
     TileIndex& completeDown(Flag::value_type type = Flag::any);
 
-    /** Finds fines nonempty LOD and runs completeDown from that LOD.
+    /** Finds the finest non-empty LOD and copies it into every empty LOD
+     *  below, so coverage reaches the maximum LOD.
+     *
+     *  \param type a tile descends when (value & type) is non-zero; the
+     *      full value is copied, type only selects which tiles descend.
+     *      Flag::any (default) propagates every non-empty tile.
+     *  \param clearOnFill flags stripped from the synthesised LODs only;
+     *      the source LOD and above keep theirs. Flag::none (default)
+     *      strips nothing.
      */
-    TileIndex& completeDownFromBottom(Flag::value_type type = Flag::any);
+    TileIndex& completeDownFromBottom(Flag::value_type type = Flag::any
+                                      , Flag::value_type clearOnFill
+                                      = Flag::none);
 
     /** Ensures that quad-tree comdition is met: every tile has its sibling.
      */
