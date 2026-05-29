@@ -113,6 +113,7 @@ namespace tools = vtslibs::vts::tools;
     ((tileIndexInfo)("tileindex-info"))                             \
     ((tileIndexRanges)("tileindex-ranges"))                         \
     ((convertTileIndex)("convert-tileindex"))                       \
+    ((completeTileindexUp)("complete-tileindex-up"))                \
     ((concat)("concat"))                                            \
     ((aggregate)("aggregate"))                                      \
     ((remote)("remote"))                                            \
@@ -330,6 +331,8 @@ private:
     int tileIndexRanges();
 
     int convertTileIndex();
+
+    int completeTileindexUp();
 
     int concat();
 
@@ -1141,6 +1144,28 @@ void VtsStorage::configuration(po::options_description &cmdline
              , "Path of output tileindex.")
             ;
         p.positional.add("output", -1);
+    });
+
+    createParser(cmdline, Command::completeTileindexUp
+                 , "--command=complete-tileindex-up: derive coarser LODs "
+                 "(down to lodRange.min) from the finest existing LOD by "
+                 "fine-to-coarse reduction; writes a new tileindex"
+                 , [&](UP &p)
+    {
+        p.options.add_options()
+            ("output", po::value(&outputPath_)->required()
+             , "Path of output (enriched) tileindex.")
+            ("lodRange", po::value<vts::LodRange>()->required()
+             , "Target LOD range; its minimum is the coarsest LOD to "
+             "generate. Existing LODs are preserved.")
+            ;
+        p.positional.add("output", 1);
+
+        p.configure = [&](const po::variables_map &vars) {
+            if (vars.count("lodRange")) {
+                optLodRange_ = vars["lodRange"].as<vts::LodRange>();
+            }
+        };
     });
 
     createParser(cmdline, Command::concat
@@ -2959,6 +2984,188 @@ int VtsStorage::convertTileIndex()
     ti.load(path_);
     ti.save(outputPath_);
 
+    return EXIT_SUCCESS;
+}
+
+int VtsStorage::completeTileindexUp()
+{
+    typedef vts::TileIndex::Flag TiFlag;
+    typedef std::pair<unsigned int, unsigned int> ParentKey;
+
+    // never clobber the input
+    if (outputPath_ == path_) {
+        std::cerr << "vts: --output must differ from the input path.\n";
+        return EXIT_FAILURE;
+    }
+    if (fs::exists(outputPath_)) {
+        std::cerr << "vts: output " << outputPath_
+                  << " already exists; refusing to overwrite.\n";
+        return EXIT_FAILURE;
+    }
+    if (!optLodRange_) {
+        std::cerr << "vts: --lodRange is required.\n";
+        return EXIT_FAILURE;
+    }
+
+    // load input read-only
+    vts::TileIndex ti;
+    ti.load(path_);
+
+    if (ti.trees().empty()) {
+        std::cerr << "vts: input tileindex is empty.\n";
+        return EXIT_FAILURE;
+    }
+
+    // baseLod is the finest existing LOD from which we coarsen upward
+    const vts::Lod baseLod(ti.lodRange().min);
+    const vts::Lod targetMin(optLodRange_->min);
+
+    if (targetMin >= baseLod) {
+        std::cerr << "vts: target lodRange.min (" << int(targetMin)
+                  << ") must be coarser than the existing minimum LOD ("
+                  << int(baseLod) << ").\n";
+        return EXIT_FAILURE;
+    }
+
+    const unsigned int levels(baseLod - targetMin);
+
+    // Coverage is carried as a fixed-point integer (no floating point): the
+    // scale K is a power of two large enough that every /4 reduction over the
+    // whole LOD span is an exact integer division. Watertight is reduced
+    // separately as an exact boolean AND, so it never depends on a numeric
+    // equality.
+    if ((2u * levels + 1u) > 31u) {
+        std::cerr << "vts: LOD span too large for exact fixed-point "
+                     "coverage.\n";
+        return EXIT_FAILURE;
+    }
+    const std::uint32_t K(std::uint32_t(1) << (2u * levels + 1u));
+    const std::uint32_t meshThreshold(K / 8);   // coverage >= 1/8
+
+    // per-LOD coverage and watertight (0/1) trees, built fine to coarse
+    std::map<vts::Lod, vts::QTree> cov;
+    std::map<vts::Lod, vts::QTree> wt;
+
+    // base level from the existing finest LOD: watertight -> K, mesh-only ->
+    // K/2, absent -> 0
+    {
+        const vts::QTree *base
+            (static_cast<const vts::TileIndex &>(ti).tree(baseLod));
+        vts::QTree cb(baseLod), wb(baseLod);
+
+        base->forEachNode([&](unsigned int x, unsigned int y
+                              , unsigned int size
+                              , vts::QTree::value_type v)
+        {
+            if (v & TiFlag::watertight) {
+                cb.set(x, y, x + size - 1, y + size - 1, K);
+                wb.set(x, y, x + size - 1, y + size - 1, 1);
+            } else if (v & TiFlag::mesh) {
+                cb.set(x, y, x + size - 1, y + size - 1, K / 2);
+            }
+        }, vts::QTree::Filter::white);
+
+        cov.emplace(baseLod, std::move(cb));
+        wt.emplace(baseLod, std::move(wb));
+    }
+
+    // reduce one LOD at a time
+    for (vts::Lod lod(baseLod); lod > targetMin; --lod) {
+        const vts::Lod parent(lod - 1);
+        const vts::QTree &cChild(cov.at(lod));
+        const vts::QTree &wChild(wt.at(lod));
+
+        vts::QTree cPar(parent), wPar(parent);
+
+        // coverage: parent = mean of four children. A uniform node of size>=2
+        // fully covers its parent quads; each such parent is the mean of four
+        // equal children, i.e. the same value. Fragmented (size 1) children
+        // are summed and divided by four (missing siblings count as zero); the
+        // division is exact by the power-of-two scale.
+        std::map<ParentKey, std::uint64_t> cAccum;
+
+        cChild.forEachNode([&](unsigned int x, unsigned int y
+                               , unsigned int size, std::uint32_t v)
+        {
+            if (size >= 2) {
+                const unsigned int hs(size / 2);
+                cPar.set(x / 2, y / 2, x / 2 + hs - 1, y / 2 + hs - 1, v);
+            } else {
+                cAccum[ParentKey(x >> 1, y >> 1)] += v;
+            }
+        }, vts::QTree::Filter::white);
+
+        for (const auto &kv : cAccum) {
+            cPar.set(kv.first.first, kv.first.second
+                     , std::uint32_t(kv.second / 4));
+        }
+
+        // watertight: parent watertight iff all four children watertight. A
+        // uniform watertight node of size>=2 fully covers its parent quads;
+        // for fragmented children a parent qualifies only when all four are
+        // present and watertight (count == 4).
+        std::map<ParentKey, unsigned int> wAccum;
+
+        wChild.forEachNode([&](unsigned int x, unsigned int y
+                               , unsigned int size, std::uint32_t)
+        {
+            if (size >= 2) {
+                const unsigned int hs(size / 2);
+                wPar.set(x / 2, y / 2, x / 2 + hs - 1, y / 2 + hs - 1, 1);
+            } else {
+                ++wAccum[ParentKey(x >> 1, y >> 1)];
+            }
+        }, vts::QTree::Filter::white);
+
+        for (const auto &kv : wAccum) {
+            if (kv.second == 4) {
+                wPar.set(kv.first.first, kv.first.second, 1);
+            }
+        }
+
+        cov.emplace(parent, std::move(cPar));
+        wt.emplace(parent, std::move(wPar));
+    }
+
+    // assemble output: copy preserves the existing LODs; makeAvailable adds
+    // empty trees for the new coarse LODs
+    vts::TileIndex out(ti);
+    out.makeAvailable(vts::LodRange(targetMin, ti.maxLod()));
+
+    for (vts::Lod lod(targetMin); lod < baseLod; ++lod) {
+        const vts::QTree &c(cov.at(lod));
+        const vts::QTree &w(wt.at(lod));
+
+        // mesh (and navtile, which the tool sets across the whole coarse
+        // overview band) wherever coverage clears the threshold
+        c.forEachNode([&](unsigned int x, unsigned int y
+                          , unsigned int size, std::uint32_t v)
+        {
+            if (v < meshThreshold) { return; }
+            out.set(lod, vts::TileRange(x, y, x + size - 1, y + size - 1)
+                    , TiFlag::mesh | TiFlag::navtile);
+        }, vts::QTree::Filter::white);
+
+        // watertight from its own reduction (watertight implies mesh, so these
+        // tiles already exist in the output)
+        w.forEachNode([&](unsigned int x, unsigned int y
+                          , unsigned int size, std::uint32_t)
+        {
+            out.update(lod
+                       , vts::TileRange(x, y, x + size - 1, y + size - 1)
+                       , [](TiFlag::value_type val)
+            {
+                return val | TiFlag::watertight;
+            });
+        }, vts::QTree::Filter::white);
+    }
+
+    out.save(outputPath_);
+
+    LOG(info4) << "Wrote enriched tileindex " << outputPath_
+               << " (LODs " << int(targetMin) << ".." << int(ti.maxLod())
+               << "); existing LODs " << int(baseLod) << ".."
+               << int(ti.maxLod()) << " preserved.";
     return EXIT_SUCCESS;
 }
 
