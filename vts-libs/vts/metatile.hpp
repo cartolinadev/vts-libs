@@ -68,6 +68,9 @@ struct MetaNode {
 
             , alien = 0x100
 
+            // tile mesh fully covers its geographic cell (metatile v6+)
+            , watertight = 0x200
+
             , allChildren = (ulChild | urChild | llChild | lrChild)
             , nonChildren = value_type(~allChildren)
             , none = 0x00
@@ -122,6 +125,11 @@ struct MetaNode {
     bool alien() const { return check(Flag::alien); }
     MetaNode& alien(bool value) {
         return set(Flag::alien, value);
+    }
+
+    bool watertight() const { return check(Flag::watertight); }
+    MetaNode& watertight(bool value) {
+        return set(Flag::watertight, value);
     }
 
     void update(Flag::value_type flags) { flags_ |= flags; }

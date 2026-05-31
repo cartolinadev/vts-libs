@@ -48,7 +48,7 @@ namespace vtslibs { namespace vts {
 
 namespace {
     const char MAGIC[2] = { 'M', 'T' };
-    const std::uint16_t VERSION = 5;
+    const std::uint16_t VERSION = 6;
 
     const std::size_t MIN_GEOM_BITS(2);
 } // namespace
@@ -187,8 +187,9 @@ struct MetaTileFlag {
     enum : value_type {
         // flag planes
         alienPlane = 0x01
+        , watertightPlane = 0x02
         // NB: do not forget to add other flag planes here
-        , flagPlanes = (alienPlane)
+        , flagPlanes = (alienPlane | watertightPlane)
 
         // other flags
         , sourceReferenceByte = 0x40
@@ -233,6 +234,7 @@ struct MetaTileFlag {
 
 std::initializer_list<MetaTileFlag::FlagMapping> MetaTileFlag::flagMapping = {
     { MetaTileFlag::alienPlane, MetaNode::Flag::alien }
+    , { MetaTileFlag::watertightPlane, MetaNode::Flag::watertight }
 };
 
 std::uint16_t loadVersionImpl(std::istream &in, const fs::path &path)
