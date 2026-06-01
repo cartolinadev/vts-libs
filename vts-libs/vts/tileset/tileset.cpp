@@ -520,6 +520,14 @@ struct TileSet::Factory
                     reencode(tid, nodeInfo
                              , *sd, *dd, mesh, atlas, eflags, copyMetanode()
                              , cloneOptions->textureQuality());
+
+                    // v5 metanodes carry no watertight bit; when re-encoding
+                    // metatiles, take it from the tile index so the re-encoded
+                    // (v6) metatile reports watertight tiles correctly
+                    if (eflags & CloneOptions::EncodeFlag::meta) {
+                        copyMetanode().watertight
+                            (mask & TileIndex::Flag::watertight);
+                    }
                 } else {
                     if (mesh) {
                         // copy mesh
