@@ -39,7 +39,7 @@ const storage::SupportFile::Vars defaultSupportVars([]()
 {
     storage::SupportFile::Vars vars;
     vars["VTS_BUILTIN_BROWSER_URL"]
-        = "//cdn.tspl.re/libs/cartolina";
+        = "https://cdn.tspl.re/libs/cartolina/dist/current";
     return vars;
 }());
 
