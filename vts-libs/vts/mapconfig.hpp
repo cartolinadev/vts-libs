@@ -131,6 +131,13 @@ struct SurfaceCommonConfig {
      */
     boost::optional<SurfaceUrls2d> urls2d;
 
+    /** Effective metatile packaging (RFC 7); advertised to clients
+     *  when set. Unset means reference-frame metaBinaryOrder and
+     *  depth 1.
+     */
+    boost::optional<unsigned int> metaBinaryOrder;
+    boost::optional<unsigned int> metaDepth;
+
     SurfaceCommonConfig() :
         hasTextures(true), hasNormalMaps(false),
         has2dInterface(false), generatorRevision(0), revision(0) {}

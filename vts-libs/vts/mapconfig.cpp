@@ -143,6 +143,16 @@ Json::Value asJson(const Glue::Id &id)
     return value;
 }
 
+void addPackaging(const SurfaceCommonConfig &surface, Json::Value &s)
+{
+    if (surface.metaBinaryOrder) {
+        s["metaBinaryOrder"] = *surface.metaBinaryOrder;
+    }
+    if (surface.metaDepth) {
+        s["metaDepth"] = *surface.metaDepth;
+    }
+}
+
 void addRanges(const SurfaceCommonConfig &surface, Json::Value &s)
 {
     auto &lodRange(s["lodRange"] = Json::arrayValue);
@@ -163,6 +173,7 @@ void asJson(const SurfaceCommonConfig &surface, Json::Value &s
             , const MapConfigOptions *mco = nullptr)
 {
     addRanges(surface, s);
+    addPackaging(surface, s);
 
     const auto root(surface.root(proxy(mco)));
 
@@ -357,6 +368,16 @@ void fromJson(SurfaceCommonConfig &surface, const Json::Value &value)
     if (value.isMember("textureLayer")) {
         surface.textureLayer = boost::in_place();
         Json::get(*surface.textureLayer, value, "textureLayer");
+    }
+
+    if (value.isMember("metaBinaryOrder")) {
+        surface.metaBinaryOrder = boost::in_place();
+        Json::get(*surface.metaBinaryOrder, value, "metaBinaryOrder");
+    }
+
+    if (value.isMember("metaDepth")) {
+        surface.metaDepth = boost::in_place();
+        Json::get(*surface.metaDepth, value, "metaDepth");
     }
 }
 

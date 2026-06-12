@@ -107,6 +107,17 @@ struct FullTileSetProperties : TileSetProperties {
      */
     boost::optional<double> nominalTexelSize;
 
+    /** Effective metatile packaging (RFC 7): horizontal binary order
+     *  of the metatile delivery unit. Unset means the reference-frame
+     *  value.
+     */
+    boost::optional<unsigned int> metaBinaryOrder;
+
+    /** Effective metatile packaging (RFC 7): number of LOD levels in
+     *  one metatile delivery unit. Unset means 1 (single-LOD blocks).
+     */
+    boost::optional<unsigned int> metaDepth;
+
     FullTileSetProperties() :
         revision(0), mergeBottomLod(0) {}
 

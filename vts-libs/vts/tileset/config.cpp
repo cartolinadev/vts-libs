@@ -306,6 +306,16 @@ FullTileSetProperties parse1(const Json::Value &config)
         Json::get(*properties.nominalTexelSize, config, "nominalTexelSize");
     }
 
+    if (config.isMember("metaBinaryOrder")) {
+        properties.metaBinaryOrder = boost::in_place();
+        Json::get(*properties.metaBinaryOrder, config, "metaBinaryOrder");
+    }
+
+    if (config.isMember("metaDepth")) {
+        properties.metaDepth = boost::in_place();
+        Json::get(*properties.metaDepth, config, "metaDepth");
+    }
+
     return properties;
 }
 
@@ -354,6 +364,14 @@ void build(Json::Value &config, const FullTileSetProperties &properties)
 
     if (properties.nominalTexelSize) {
         config["nominalTexelSize"] = *properties.nominalTexelSize;
+    }
+
+    if (properties.metaBinaryOrder) {
+        config["metaBinaryOrder"] = *properties.metaBinaryOrder;
+    }
+
+    if (properties.metaDepth) {
+        config["metaDepth"] = *properties.metaDepth;
     }
 }
 

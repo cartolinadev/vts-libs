@@ -1774,6 +1774,10 @@ MapConfig mapConfig(const FullTileSetProperties &properties
         surface.tileRange = properties.tileRange;
     }
 
+    // effective metatile packaging (RFC 7)
+    surface.metaBinaryOrder = properties.metaBinaryOrder;
+    surface.metaDepth = properties.metaDepth;
+
     // TODO: add
     surface.textureLayer = extra.textureLayer;
 
