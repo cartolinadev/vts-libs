@@ -203,7 +203,8 @@ std::string fileTemplate(TileFile type, FileFlavor flavor
     auto fa(true);
 
     if (revision || generatorRevision) {
-        ext = str(boost::format("%s?%s") % ext % *revision);
+        // open the query string; the actual parameters are appended below
+        ext = str(boost::format("%s?") % ext);
     }
 
     if (generatorRevision && *generatorRevision > 0) {
